@@ -40,7 +40,7 @@ ValidateSchema.prototype.response = function response (schema) {
 }
 
 //
-//
+// functions
 //
 
 function procRequest (type, options, schema, req, res, next) {

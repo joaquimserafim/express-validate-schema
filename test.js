@@ -36,12 +36,6 @@ const headersSchema = Joi.object().keys(
   }
 )
 
-// const responseSchema = Joi.object().keys(
-//   {
-
-//   }
-// )
-
 describe('express midlleware schema validator', () => {
 
   describe('request', () => {
@@ -75,6 +69,13 @@ describe('express midlleware schema validator', () => {
         '/headers',
         validateSchema().headers(headersSchema),
         (req, res) => { res.send('headers') }
+      )
+
+      // using Joi.validate options
+      router.get(
+        '/allowunknown',
+        validateSchema({allowUnknown: true}).query(someSchema),
+        (req, res) => { res.send('`joi.validate` options') }
       )
 
       app.use(bodyParser.json())
@@ -140,6 +141,14 @@ describe('express midlleware schema validator', () => {
         .set('id', 123)
         .expect(200, 'headers', done)
     })
+
+    it('should return a 200 when setting options for `joi.validate`',
+      (done) => {
+        request(app)
+          .get('/request/allowunknown?id=123&hello=world')
+          .expect(200, '`joi.validate` options', done)
+      }
+    )
   })
 
   describe('response', () => {
