@@ -11,7 +11,7 @@
   "scripts": {
     "coverage": "open coverage/lcov-report/index.html",
     "coverage:check": "istanbul check-coverage --statements 100 --functions 100 --lines 100 --branches 100",
-    "test": "standard --fix && istanbul cover _mocha test.js"
+    "test": "standard check  && istanbul cover _mocha test.js"
   },
   "repository": {
     "type": "git",
@@ -46,8 +46,7 @@
     "supertest": "^2.0.1"
   },
   "dependencies": {
-    "joi": "^10.0.2",
-    "node-apply": "^1.0.0"
+    "joi": "^10.0.2"
   },
   "engines": {
     "node": ">=6.1"
