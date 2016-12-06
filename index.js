@@ -65,7 +65,8 @@ function procResponse (options, schema, req, res, next) {
       ? res._json(body)
       : Joi.validate(body, schema, options, validateResponse)
 
-    function validateResponse (err) {debugger
+    function validateResponse (err) {
+
       return err
         ? res.status(500).end(err.message)
         : res._json(body)
