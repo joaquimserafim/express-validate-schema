@@ -19,18 +19,23 @@ route.get('/', validateSchema().query(query_schema), your_route_function)
 ```
 
 **validating query string**
+
 `validateSchema([joi options]).query(some joi schema)`
 
 **validating params**
+
 `validateSchema([joi options]).params(some joi schema)`
 
 **validating body**
+
 `validateSchema([joi options]).body(some joi schema)`
 
 **validating headers**
+
 `validateSchema([joi options]).headers(some joi schema)`
 
 **validating response**
+
 `validateSchema([joi options]).response(some joi schema)`
 
 
