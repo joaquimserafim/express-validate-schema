@@ -11,7 +11,7 @@
   "scripts": {
     "coverage": "open coverage/lcov-report/index.html",
     "coverage:check": "istanbul check-coverage --statements 100 --functions 100 --lines 100 --branches 100",
-    "test": "standard check  && istanbul cover _mocha test.js"
+    "test": "standard --fix check  && istanbul cover _mocha test.js"
   },
   "repository": {
     "type": "git",
