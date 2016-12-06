@@ -6,8 +6,9 @@ max-len: ["error", 80]
 */
 'use strict'
 
-const Joi   = require('joi')
-const apply = require('node-apply')
+const Joi     = require('joi')
+const apply   = require('node-apply')
+const between = require('between-range')
 
 module.exports = ValidateSchema
 
@@ -40,7 +41,7 @@ ValidateSchema.prototype.response = function response (schema) {
 }
 
 //
-// functions
+// internal functions
 //
 
 function procRequest (type, options, schema, req, res, next) {
@@ -55,15 +56,16 @@ function procRequest (type, options, schema, req, res, next) {
 }
 
 function procResponse (options, schema, req, res, next) {
-
   res._json = res.json
   res.json = jsonMethodOverride
 
   function jsonMethodOverride (body) {
 
-    Joi.validate(body, schema, options, validateResponse)
+    return isHttpError(res.statusCode)
+      ? res._json(body)
+      : Joi.validate(body, schema, options, validateResponse)
 
-    function validateResponse (err) {
+    function validateResponse (err) {debugger
       return err
         ? res.status(500).end(err.message)
         : res._json(body)
@@ -73,3 +75,10 @@ function procResponse (options, schema, req, res, next) {
   next()
 }
 
+//
+// supports official and unofficial code
+//
+
+function isHttpError (statusCode) {
+  return between(statusCode, 400, 599)
+}

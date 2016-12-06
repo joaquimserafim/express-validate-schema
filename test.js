@@ -73,9 +73,20 @@ describe('express midlleware schema validator', () => {
 
       // using Joi.validate options
       router.get(
-        '/allowunknown',
+        '/joi.validate',
         validateSchema({allowUnknown: true}).query(someSchema),
         (req, res) => { res.send('`joi.validate` options') }
+      )
+
+      // multiple validations
+      router.put(
+        '/someresouce/:id',
+        validateSchema().params(someSchema),
+        validateSchema()
+          .body(Joi.object().keys({name: Joi.string().required()})),
+        validateSchema({allowUnknown: true})
+          .headers(Joi.object().keys({hello: Joi.string().required()})),
+        (req, res) => { res.send('yay!') }
       )
 
       app.use(bodyParser.json())
@@ -142,11 +153,35 @@ describe('express midlleware schema validator', () => {
         .expect(200, 'headers', done)
     })
 
-    it('should return a 200 when setting options for `joi.validate`',
+    it('should return a 200 when using `joi.validate` options',
       (done) => {
         request(app)
-          .get('/request/allowunknown?id=123&hello=world')
+          .get('/request/joi.validate?id=123&hello=world')
           .expect(200, '`joi.validate` options', done)
+      }
+    )
+
+    it('should throw a 400 when fail in one of the validations',
+      (done) => {
+        request(app)
+          .put('/request/someresouce/123')
+          .set('hello', 'world')
+          .send({name: 123})
+          .expect(
+            400,
+            'child "name" fails because ["name" must be a string]',
+            done
+          )
+      }
+    )
+
+    it('should return a 200 when doing various validations',
+      (done) => {
+        request(app)
+          .put('/request/someresouce/123')
+          .set('hello', 'world')
+          .send({name: 'Joe Doe'})
+          .expect(200, 'yay!', done)
       }
     )
   })
@@ -168,23 +203,46 @@ describe('express midlleware schema validator', () => {
         (req, res) => { res.send({id: 'bad'}) }
       )
 
+      router.get(
+        '/502',
+        validateSchema().response(someSchema),
+        (req, res) => { res.status(502).send({message: 'alarm!!!'}) }
+      )
+
       app.use(bodyParser.json())
       app.use('/response', router)
 
       done()
     })
 
-    it('should return a 200 for a valid response', (done) => {
-      request(app)
-        .get('/response/good')
-        .expect(200, {id: 123}, done)
-    })
+    it('should follow the server normal behaviour when an ' +
+      'error happens (server logic) 4.x.x / 5.x.x without json response',
+      (done) => {
+        request(app)
+          .get('/response/dontexists')
+          .expect(404, done)
+      }
+    )
+
+ it('should follow the server normal behaviour when an ' +
+      'error happens (server logic) 4.x.x / 5.x.x with a json response',
+      (done) => {
+        request(app)
+          .get('/response/502')
+          .expect(502, {message: 'alarm!!!'}, done)
+      }
+    )
 
     it('should throw a 500 for an invalid response', (done) => {
       request(app)
         .get('/response/bad')
         .expect(500, 'child "id" fails because ["id" must be a number]', done)
+    })
 
+    it('should return a 200 for a valid response', (done) => {
+      request(app)
+        .get('/response/good')
+        .expect(200, {id: 123}, done)
     })
   })
 })
