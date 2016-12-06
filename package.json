@@ -47,7 +47,8 @@
   },
   "dependencies": {
     "between-range": "^1.0.0",
-    "joi": "^10.0.2"
+    "joi": "^10.0.2",
+    "node-apply": "^1.0.0"
   },
   "engines": {
     "node": ">=6.1"
