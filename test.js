@@ -224,7 +224,7 @@ describe('express midlleware schema validator', () => {
       }
     )
 
- it('should follow the server normal behaviour when an ' +
+    it('should follow the server normal behaviour when an ' +
       'error happens (server logic) 4.x.x / 5.x.x with a json response',
       (done) => {
         request(app)
