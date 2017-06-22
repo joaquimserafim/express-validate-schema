@@ -91,6 +91,7 @@ describe('express midlleware schema validator', () => {
 
       app.use(bodyParser.json())
       app.use('/request', router)
+      app.use((err, req, res, next) => res.send(err.message))
 
       done()
     })

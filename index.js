@@ -50,7 +50,7 @@ function procRequest (type, options, schema, req, res, next) {
 
   function validateRequest (err, value) {
     return err
-      ? res.status(400).send(err.message)
+      ? res.status(400) && next(err)
       : (req[type] = value) && next()
   }
 }
