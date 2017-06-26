@@ -92,7 +92,7 @@ router.put(
   validateSchema().params(someSchema),
   validateSchema()
     .body(Joi.object().keys({name: Joi.string().required()})),
-  validateSchema({allowUnknown: true})
+  validateSchema({ validationOptions: { allowUnknown: true } })
     .headers(Joi.object().keys({hello: Joi.string().required()})),
   (req, res) => { res.send('yay!') }
 )
