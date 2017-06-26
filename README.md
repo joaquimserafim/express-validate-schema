@@ -12,7 +12,14 @@
 ### api
 `const validateSchema = require('express-validate-schema')`
 
-each middleware should be define before your route function (see examples)
+validateSchema([options])
+
+**options** plain js object
+  - **validationOptions** an optional object, see `options` for joi.validate on joi repo
+  - **processHttpCallOnError** false by default means you should use an error-handling middleware, in case you don't use it you should set this to true and when gets an error/exception on the validation `express-validate-schema` will process the http call immediate
+
+
+each validation should be define before your route function (see examples) either the `response` validation
 
 ```js
 route.get('/', validateSchema().query(query_schema), your_route_function)
@@ -20,23 +27,23 @@ route.get('/', validateSchema().query(query_schema), your_route_function)
 
 **validating query string**
 
-`validateSchema([joi options]).query(some joi schema)`
+`validateSchema([options]).query(some joi schema)`
 
 **validating params**
 
-`validateSchema([joi options]).params(some joi schema)`
+`validateSchema([options]).params(some joi schema)`
 
 **validating body**
 
-`validateSchema([joi options]).body(some joi schema)`
+`validateSchema([options]).body(some joi schema)`
 
 **validating headers**
 
-`validateSchema([joi options]).headers(some joi schema)`
+`validateSchema([options]).headers(some joi schema)`
 
 **validating response**
 
-`validateSchema([joi options]).response(some joi schema)`
+`validateSchema([options]).response(some joi schema)`
 
 
 
@@ -91,7 +98,6 @@ router.put(
 )
 
 ```
-
 
 
 

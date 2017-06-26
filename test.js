@@ -41,51 +41,70 @@ describe('express midlleware schema validator', () => {
   describe('request', () => {
 
     before((done) => {
-      let router = express.Router()
+      const router = express.Router()
 
       // query string endpoint
       router.get(
         '/querystring',
-        validateSchema().query(someSchema),
+        validateSchema({ processHttpCallOnError: true }).query(someSchema),
         (req, res) => { res.send('query string') }
       )
 
       // params endpoint
       router.get(
         '/params/:id',
-        validateSchema().params(someSchema),
+        validateSchema({ processHttpCallOnError: true }).params(someSchema),
         (req, res) => { res.send('params') }
       )
 
       // body endpoint
       router.post(
         '/body',
-        validateSchema().body(someSchema),
+        validateSchema({ processHttpCallOnError: true }).body(someSchema),
         (req, res) => { res.send('body') }
       )
 
       // headers endpoint
       router.get(
         '/headers',
-        validateSchema().headers(headersSchema),
+        validateSchema({ processHttpCallOnError: true })
+          .headers(headersSchema),
         (req, res) => { res.send('headers') }
       )
 
       // using Joi.validate options
       router.get(
         '/joi.validate',
-        validateSchema({allowUnknown: true}).query(someSchema),
+        validateSchema(
+          {
+            validationOptions: { allowUnknown: true },
+            processHttpCallOnError: true
+          }
+        )
+          .query(someSchema),
         (req, res) => { res.send('`joi.validate` options') }
       )
 
       // multiple validations
       router.put(
         '/someresouce/:id',
-        validateSchema().params(someSchema),
-        validateSchema()
-          .body(Joi.object().keys({name: Joi.string().required()})),
-        validateSchema({allowUnknown: true})
-          .headers(Joi.object().keys({hello: Joi.string().required()})),
+        validateSchema({ processHttpCallOnError: true }).params(someSchema),
+        validateSchema({ processHttpCallOnError: true })
+          .body(Joi.object().keys({ name: Joi.string().required() })),
+        validateSchema(
+          {
+            validationOptions: { allowUnknown: true },
+            processHttpCallOnError: false
+          }
+        )
+          .headers(Joi.object().keys({ hello: Joi.string().required() })),
+        (req, res) => { res.send('yay!') }
+      )
+
+      // when with an error middleware
+      router.get(
+        '/middleware123',
+        validateSchema().query(someSchema),
         (req, res) => { res.send('yay!') }
       )
 
@@ -117,7 +136,7 @@ describe('express midlleware schema validator', () => {
     it('should return a 200 when validating a valid body', (done) => {
       request(app)
         .post('/request/body')
-        .send({id: 123})
+        .send({ id: 123 })
         .expect(200, 'body', done)
     })
 
@@ -167,7 +186,7 @@ describe('express midlleware schema validator', () => {
         request(app)
           .put('/request/someresouce/123')
           .set('hello', 'world')
-          .send({name: 123})
+          .send({ name: 123 })
           .expect(
             400,
             'child "name" fails because ["name" must be a string]',
@@ -181,8 +200,17 @@ describe('express midlleware schema validator', () => {
         request(app)
           .put('/request/someresouce/123')
           .set('hello', 'world')
-          .send({name: 'Joe Doe'})
+          .send({ name: 'Joe Doe' })
           .expect(200, 'yay!', done)
+      }
+    )
+
+    it('should return a 400 through a middleware error when setting' +
+      ' `processHttpCallOnError` to false',
+      (done) => {
+        request(app)
+          .get('/request/middleware123')
+          .expect(400, 'child "id" fails because ["id" is required]', done)
       }
     )
   })
@@ -190,28 +218,39 @@ describe('express midlleware schema validator', () => {
   describe('response', () => {
 
     before((done) => {
-      let router = express.Router()
+      const router = express.Router()
 
       router.get(
         '/good',
-        validateSchema().response(someSchema),
+        validateSchema({ processHttpCallOnError: true })
+          .response(someSchema),
+        (req, res) => { res.send({id: 123}) }
+      )
+
+      router.get(
+        '/processhttpcallimmediate',
+        validateSchema({ processHttpCallOnError: true })
+          .response(Joi.object().keys({ value: 'ok' })),
         (req, res) => { res.send({id: 123}) }
       )
 
       router.get(
         '/bad',
-        validateSchema().response(someSchema),
+        validateSchema({ processHttpCallOnError: false })
+          .response(someSchema),
         (req, res) => { res.send({id: 'bad'}) }
       )
 
       router.get(
         '/502',
-        validateSchema().response(someSchema),
+        validateSchema({ processHttpCallOnError: true })
+          .response(someSchema),
         (req, res) => { res.status(502).send({message: 'alarm!!!'}) }
       )
 
       app.use(bodyParser.json())
       app.use('/response', router)
+      app.use((err, req, res, next) => res.send(err.message))
 
       done()
     })
@@ -230,9 +269,15 @@ describe('express midlleware schema validator', () => {
       (done) => {
         request(app)
           .get('/response/502')
-          .expect(502, {message: 'alarm!!!'}, done)
+          .expect(502, { message: 'alarm!!!' }, done)
       }
     )
+
+    it('should throw a 500 for an invalid response', (done) => {
+      request(app)
+        .get('/response/processhttpcallimmediate')
+        .expect(500, '"id" is not allowed', done)
+    })
 
     it('should throw a 500 for an invalid response', (done) => {
       request(app)
@@ -243,7 +288,7 @@ describe('express midlleware schema validator', () => {
     it('should return a 200 for a valid response', (done) => {
       request(app)
         .get('/response/good')
-        .expect(200, {id: 123}, done)
+        .expect(200, { id: 123 }, done)
     })
   })
 })

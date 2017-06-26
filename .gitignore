@@ -2,3 +2,5 @@ node_modules
 .npmignore
 .DS_Store
 coverage
+*.html
+.nyc_output
