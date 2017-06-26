@@ -1,6 +1,6 @@
 {
   "name": "express-validate-schema",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "a simple express middleware to validate the request/response objects (body, params, querystring and headers) againts an object schema with joi",
   "main": "index.js",
   "files": [

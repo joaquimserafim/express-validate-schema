@@ -4,7 +4,7 @@
 
 <a href="https://nodei.co/npm/express-validate-schema/"><img src="https://nodei.co/npm/express-validate-schema.png?downloads=true"></a>
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)](https://travis-ci.org/joaquimserafim/express-validate-schema)![Code Coverage 100%](https://img.shields.io/badge/code%20coverage-100%25-green.svg?style=flat-square)[![ISC License](https://img.shields.io/badge/license-ISC-blue.svg?style=flat-square)](https://github.com/joaquimserafim/express-validate-schema/blob/master/LICENSE)[![NodeJS](https://img.shields.io/badge/node-6.1.x-brightgreen.svg?style=flat-square)](https://github.com/joaquimserafim/express-validate-schema/blob/master/package.json#L54)
+[![Build Status](https://travis-ci.org/joaquimserafim/express-validate-schema.svg?branch=master)](https://travis-ci.org/joaquimserafim/express-validate-schema)[![Coverage Status](https://coveralls.io/repos/github/joaquimserafim/express-validate-schema/badge.svg?branch=master)](https://coveralls.io/github/joaquimserafim/express-validate-schema?branch=master)[![ISC License](https://img.shields.io/badge/license-ISC-blue.svg?style=flat-square)](https://github.com/joaquimserafim/express-validate-schema/blob/master/LICENSE)[![NodeJS](https://img.shields.io/badge/node-6.1.x-brightgreen.svg?style=flat-square)](https://github.com/joaquimserafim/express-validate-schema/blob/master/package.json#L55)
 
 [![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 

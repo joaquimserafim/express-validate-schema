@@ -1,10 +1,12 @@
- language: node_js
- node_js:
+language: node_js
+node_js:
   - 6
- branches:
- only:
+  - 7
+branches:
+only:
   - master
- notifications:
+notifications:
   email:
-   - joaquim.serafim@gmail.com
- script: npm test
+    - joaquim.serafim@gmail.com
+script: npm test
+after_success: npm run coverage
