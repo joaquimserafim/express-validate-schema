@@ -32,6 +32,10 @@ class ValidateSchema {
     return procRequest.bind(this, 'headers', schema)
   }
 
+  custom (key, schema) {
+    return procRequest.bind(this, key, schema)
+  }
+
   response (schema) {
     return procResponse.bind(this, schema)
   }

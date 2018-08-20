@@ -26,6 +26,8 @@ const someSchema = Joi.object().keys(
   }
 )
 
+const customSchema = Joi.string().required()
+
 const headersSchema = Joi.object().keys(
   {
     host: Joi.string(),
@@ -70,6 +72,18 @@ describe('express midlleware schema validator', () => {
         validateSchema({ processHttpCallOnError: true })
           .headers(headersSchema),
         (req, res) => { res.send('headers') }
+      )
+
+      // custom key validation endpoint
+      router.get(
+        '/custom/:foobar?',
+        (req, res, next) => {
+          req.foobar = req.params.foobar
+          next()
+        },
+        validateSchema({ processHttpCallOnError: true })
+          .custom('foobar', customSchema),
+        (req, res) => { res.send('custom') }
       )
 
       // using Joi.validate options
@@ -153,24 +167,16 @@ describe('express midlleware schema validator', () => {
         .expect(200, 'query string', done)
     })
 
-    it('should return a 200 when validating a valid param(s)', (done) => {
+    it('should return a 200 when validating a valid custom req key', (done) => {
       request(app)
-        .get('/request/params/123')
-        .expect(200, 'params', done)
+        .get('/request/custom/foobar')
+        .expect(200, 'custom', done)
     })
 
-    it('should return a 200 when validating a valid body', (done) => {
+    it('should return a 400 when fails to validate custom req key', (done) => {
       request(app)
-        .post('/request/body')
-        .send({id: 123})
-        .expect(200, 'body', done)
-    })
-
-    it('should return a 200 when validating a valid header(s)', (done) => {
-      request(app)
-        .get('/request/headers')
-        .set('id', 123)
-        .expect(200, 'headers', done)
+        .get('/request/custom')
+        .expect(400, '"value" is required', done)
     })
 
     it('should return a 200 when using `joi.validate` options',

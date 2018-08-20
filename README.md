@@ -41,6 +41,10 @@ route.get('/', validateSchema().query(query_schema), your_route_function)
 
 `validateSchema([options]).headers(some joi schema)`
 
+**validating a custom key in the req object**
+
+`validateSchema([options]).custom('key', some joi schema)`
+
 **validating response**
 
 `validateSchema([options]).response(some joi schema)`
@@ -84,6 +88,17 @@ router.get(
   '/headers',
   validateSchema().headers(headersSchema),
   (req, res) => { res.send(someBody) }
+)
+
+// validating the foobar custom req key
+router.get(
+  '/custom/:foobar?',
+  (req, res, next) => {
+    req.foobar = req.params.foobar
+    next()
+  },
+  validateSchema({ processHttpCallOnError: true }).custom('foobar', customSchema),
+  (req, res) => { res.send('custom') }
 )
 
 // validating params, body and header
